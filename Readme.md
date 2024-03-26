@@ -58,3 +58,9 @@ we will create a subclass ApiErrors to Overwrite the InBuild Nodejs ERROR(class 
 
 //mongoose-aggregate-paginate-v2 
 it will give mongoose a superpower to perform aggregation operations to filter, transform, and analyze data.
+
+//bcrypt
+hashing the password
+
+//jsonwebtoken(jwt)
+for authentication we create token by using jwt
