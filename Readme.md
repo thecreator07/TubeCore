@@ -54,3 +54,7 @@ app.get(err,req,res,next)   //next is the middleware
 //IN utils
 In ApiErrors.js
 we will create a subclass ApiErrors to Overwrite the InBuild Nodejs ERROR(class ApiError extends Error)
+
+
+//mongoose-aggregate-paginate-v2 
+it will give mongoose a superpower to perform aggregation operations to filter, transform, and analyze data.
