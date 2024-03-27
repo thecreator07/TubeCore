@@ -49,7 +49,6 @@ app.use(express.urlencoded({extended:true,limit:"20kb"}))
 app.use(express.static("public"))        //to run the file(./dist) or store the jpg/png,  public file can also be ./dist folder
 app.use(cookieParser())                  //to access the cookies of users
 
-app.get(err,req,res,next)   //next is the middleware
 
 //IN utils
 In ApiErrors.js
@@ -64,3 +63,5 @@ hashing the password
 
 //jsonwebtoken(jwt)
 for authentication we create token by using jwt
+
+//file upload using Multer Or express-fileupload
