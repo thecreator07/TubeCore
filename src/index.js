@@ -1,14 +1,12 @@
-import express from "express";
-import mongoose from "mongoose";
-import { DB_NAME } from "./constant.js";
+// import mongoose from "mongoose";
+// import { DB_NAME } from "./constant.js";
 import "dotenv/config";
 import connectDB from "./db/index.js";
+import { app } from "./app.js";
 
-const app = express();
 const port = process.env.PORT || 8000;
 connectDB()
   .then(() => {
-    
     app.listen(port, () => {
       console.log(`😃🫡Server running on port: http://localhost:${port}`);
     });

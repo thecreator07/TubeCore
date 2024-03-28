@@ -49,7 +49,7 @@ const userSchema = new Schema(
 //Pre middleware hook are executed one after another, when each middleware calls next.
 //before saving the user data we hash password using bcrypt for security purpose
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
+  if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
     next();
   }
@@ -80,7 +80,6 @@ userSchema.methods.generateRefreshToken = async function () {
   return jwt.sign(
     {
       _id: this._id,
-     
     },
     process.env.REFRESH_TOKEN_SECRET,
     {
