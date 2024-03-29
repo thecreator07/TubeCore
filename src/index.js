@@ -2,7 +2,6 @@
 // import { DB_NAME } from "./constant.js";
 import "dotenv/config";
 import connectDB from "./db/index.js";
-
 //app is comming from express
 import { app } from "./app.js";
 
