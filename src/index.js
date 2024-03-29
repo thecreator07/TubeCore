@@ -2,10 +2,12 @@
 // import { DB_NAME } from "./constant.js";
 import "dotenv/config";
 import connectDB from "./db/index.js";
+
+//app is comming from express
 import { app } from "./app.js";
 
 const port = process.env.PORT || 8000;
-connectDB()
+connectDB() //after the connection to the database, it will call the callback and start the server
   .then(() => {
     app.listen(port, () => {
       console.log(`😃🫡Server running on port: http://localhost:${port}`);

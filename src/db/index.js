@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { DB_NAME } from "../constant.js";
 
 
+//database created using promise(tryCatch)
 const connectDB = async () => {
   try {
     const connectionInstance = await mongoose.connect(

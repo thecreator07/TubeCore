@@ -20,7 +20,7 @@ app.use(cookieParser());
 //Router import
 import useRouter from "./routes/user.routes.js";
 
-// routes declaration
+// routes declaration -- this middleware will handle all the controller(register,login)
 app.use("/api/v1/users", useRouter);
 //http://localhost:8000/api/v1/users/register
 export { app };
