@@ -75,7 +75,9 @@ userSchema.methods.generateAccesToken = async function () {
     process.env.ACCESS_TOKEN_SECRET,
     {
       expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    }
+
+    },
+    // {algorithm:'HS256'}
   );
 };
 
