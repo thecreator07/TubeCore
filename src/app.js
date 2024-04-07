@@ -18,9 +18,9 @@ app.use(express.static("public"));
 
 app.use(cookieParser());
 //Router import
-import useRouter from "./routes/user.routes.js";
+import userRouter from "./routes/user.routes.js";
 
 // routes declaration -- this middleware will handle all the controller(register,login)
-app.use("/api/v1/users", useRouter);
+app.use("/api/v1/users", userRouter);
 //http://localhost:8000/api/v1/users/register
 export { app };

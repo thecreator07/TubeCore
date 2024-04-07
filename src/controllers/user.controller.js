@@ -24,6 +24,7 @@ const generateAccesTokenAndRefreshToken = async (userId) => {
     );
   }
 };
+
 const options = {
   httpOnly: true, //only server can modify the cookie
   secure: true,
@@ -43,7 +44,7 @@ const registerUser = asyncHandler(async (req, res) => {
   )
     throw new ApiError(401, "All field are Required");
 
-  // Check if User is already exists
+  // Check if User is already exists in DB
   const existedUser = await User.findOne({
     $or: [{ username }, { email }],
   });
@@ -133,10 +134,6 @@ const loginUser = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
   // console.log(loggedInUser)
-  const options = {
-    httpOnly: true, //only server can modify the cookie
-    secure: true,
-  };
 
   // send cookies and json responce to the user
   return res
@@ -172,10 +169,6 @@ const logoutUser = asyncHandler(async (req, res) => {
       new: true,
     }
   );
-  const options = {
-    httpOnly: true, //only server can modify the cookie
-    secure: true,
-  };
 
   // console.log(req.user);
   return res
@@ -226,4 +219,4 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
     throw new ApiError(401, error?.message||"Something went wrong in Refreshing token");
   }
 });
-export { registerUser, loginUser, logoutUser, getcookie,refreshAccessToken };
+export { registerUser, loginUser, logoutUser, refreshAccessToken };
