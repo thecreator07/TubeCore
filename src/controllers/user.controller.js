@@ -1,7 +1,10 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiError } from "../utils/apiError.js";
 import { User } from "../models/user.models.js";
-import { uploadOnCloudinary } from "../utils/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  uploadOnCloudinary,
+} from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
 const generateAccesTokenAndRefreshToken = async (userId) => {
@@ -306,6 +309,12 @@ const updateAvatar = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while updating Avatar of user");
   }
 
+  const oldAvatar = req.user?.avatar;
+  console.log("oldavatar has found", oldAvatar);
+  if (!oldAvatar) {
+    throw new ApiError(400, "Old Avatar file fetch Unsuccessful");
+  }
+
   const updatedUser = await User.findByIdAndUpdate(
     req.user?._id,
     {
@@ -315,6 +324,8 @@ const updateAvatar = asyncHandler(async (req, res) => {
     },
     { new: true }
   ).select("-password");
+
+  await deleteFromCloudinary(oldAvatar);
 
   return res
     .status(200)
@@ -335,6 +346,13 @@ const updatecoverImage = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Error while updating coverImage of user");
   }
 
+  const oldcoverImage = req.user?.coverImage;
+  // console.log("oldcoverImage has found", oldcoverImage);
+  if (!oldcoverImage) {
+    throw new ApiError(400, "Old coverImage file fetch Unsuccessful");
+  }
+
+
   const updatedUser = await User.findByIdAndUpdate(
     req.user?._id,
     {
@@ -344,6 +362,8 @@ const updatecoverImage = asyncHandler(async (req, res) => {
     },
     { new: true }
   ).select("-password");
+
+  await deleteFromCloudinary(oldcoverImage);
 
   return res
     .status(200)

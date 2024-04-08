@@ -15,7 +15,7 @@ const port = process.env.PORT || 8000;
 connectDB() //after the connection to the database, it will call the callback and start the server
   .then(() => {
     app.listen(port, () => {
-      console.log(`😃🫡Server running on port: http://localhost:${port}`);
+      console.log(`😃🫡 Server running on port: http://localhost:${port}`);
     });
   })
   .catch((err) => {
