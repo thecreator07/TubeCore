@@ -19,8 +19,10 @@ app.use(cookieParser());
 //Router import
 import userRouter from "./routes/user.routes.js";
 import videoRouter from "./routes/video.routes.js"
+import tweetRouter from "./routes/tweet.routes.js"
 // routes declaration -- this middleware will handle all the controller(register,login)
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/videos",videoRouter)
+app.use("/api/v1/tweets",tweetRouter)
 //http://localhost:8000/api/v1/users/register
 export { app };
