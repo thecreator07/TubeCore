@@ -15,7 +15,7 @@ export const verifyJwt = asyncHandler(async (req, _, next) => {
     // console.log(token);
     // to make sure user is Valid, we verify token with our ACCESS_TOKEN_SECRET it will give payload from jwt.sign(from generateAccesToken() methods )
     const decodedToken = jwt.verify(token,process.env.ACCESS_TOKEN_SECRET);
-    console.log(decodedToken);
+    // console.log(decodedToken);
     // here we are accessing and Updating user from DataBase
     const user = await User.findById(decodedToken?._id).select(
       "-password -refreshToken"

@@ -52,4 +52,5 @@ const deleteFromCloudinary = async (oldAvatarUrl) => {
 //   }
 // );
 
+
 export { uploadOnCloudinary, deleteFromCloudinary };
