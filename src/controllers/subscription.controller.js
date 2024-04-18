@@ -99,7 +99,7 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     },
     {
       $unwind: "$subscriber",
-    },  
+    },
     {
       $project: {
         _id: 0,
@@ -115,7 +115,9 @@ const getUserChannelSubscribers = asyncHandler(async (req, res) => {
     },
   ]);
 
-  return res.json(new ApiResponse(200, { subscribers }, "data fetched"));
+  return res.json(
+    new ApiResponse(200, { subscribers }, "Subscribers fetched successfully")
+  );
 });
 
 // controller to return channel list to which user has subscribed
@@ -184,7 +186,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
   ]);
 
   return res.json(
-    new ApiResponse(200, { channel }, "data fetched successfully")
+    new ApiResponse(200, { channel }, "Channels fetched successfully")
   );
 });
 
