@@ -1,19 +1,21 @@
 // import mongoose from "mongoose";
 // import { DB_NAME } from "./constant.js";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import "dotenv/config";
 import connectDB from "./db/index.js";
 //app is comming from express
 import { app } from "./app.js";
 
 dotenv.config({
-    path: '.env',
-})
-
+  path: ".env",
+});
 
 const port = process.env.PORT || 8000;
 connectDB() //after the connection to the database, it will call the callback and start the server
   .then(() => {
+    app.on("Error", (err) => {
+      console.log(err);
+    });
     app.listen(port, () => {
       console.log(`😃🫡 Server running on port: http://localhost:${port}`);
     });

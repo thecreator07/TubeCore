@@ -35,7 +35,7 @@ const publishAVideo = asyncHandler(async (req, res) => {
       "Something went wrong during video and thumbnail upload on cloudinary"
     );
   }
-//   console.log(thumbnail);
+  //   console.log(thumbnail);
   const video = await Video.create({
     videoFile: videoFile.url,
     thumbnail: thumbnail.url,
@@ -83,6 +83,11 @@ const deleteVideo = asyncHandler(async (req, res) => {
   if (!videoId) {
     throw new ApiError(400, "wrong video Id");
   }
+
+  const videotobedeleted = await Video.findById(videoId);
+  await deleteFromCloudinary(videotobedeleted.videoFile);
+  await deleteFromCloudinary(videotobedeleted.thumbnail);
+
   const deletedVideo = await Video.findByIdAndDelete(videoId);
 
   if (!deletedVideo) {
@@ -129,7 +134,7 @@ const updateVideo = asyncHandler(async (req, res) => {
   );
 
   await deleteFromCloudinary(oldthumbnail.thumbnail);
-  
+
   res
     .status(200)
     .json(
