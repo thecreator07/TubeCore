@@ -1,4 +1,4 @@
-import { response } from "express";
+import { Subscription } from "../models/subscription.models.js";
 import { Video } from "../models/video.models.js";
 import { ApiError } from "../utils/apiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -7,6 +7,7 @@ import {
   deleteFromCloudinary,
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
+import mongoose, { isValidObjectId } from "mongoose";
 
 const publishAVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
@@ -65,15 +66,103 @@ const getVideoById = asyncHandler(async (req, res) => {
     throw new ApiError(400, "wrong video params");
   }
 
-  const video = await Video.findById(videoId);
-  if (!video) {
+  const isvideo = await Video.findById(videoId);
+  if (!isvideo) {
     throw new ApiError(400, "video does not found in DB");
   }
 
-  res
+  const video = await Video.aggregate([
+    {
+      $match: { _id: new mongoose.Types.ObjectId(videoId) }, //fetch video by id
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "owner",
+        foreignField: "_id",
+        as: "ownerDetails", //video owner details (channel details)
+        pipeline: [
+          {
+            $lookup: {
+              from: "subscriptions",
+              localField: "_id",
+              foreignField: "channel",
+              as: "subscribers", // fetch all subscribers of channel
+            },
+          },
+          {
+            $addFields: {
+              SubscribersCount: {
+                $size: "$subscribers",
+              },
+              IsSubscribed: {
+                $cond: {
+                  if: { $in: [req.user?._id, "$subscribers.subscriber"] },
+                  then: true,
+                  else: false,
+                },
+              },
+            },
+          },
+          {
+            $project: {
+              fullName: 1,
+              username: 1,
+              avatar: 1,
+              SubscribersCount: 1,
+              IsSubscribed: 1,
+            },
+          },
+        ],
+      },
+    },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "video",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: {
+          $size: "$likes",
+        },
+        Isliked: {
+          $cond: {
+            if: {
+              $in: [req.user?._id, "$likes.likedBy"],
+            },
+            then: true,
+            else: false,
+          },
+        },
+        owner: {
+          $first: "$ownerDetails",
+        },
+      },
+    },
+    {
+      $project: {
+        videoFile: 1,
+        thumbnail: 1,
+        title: 1,
+        description: 1,
+        duration: 1,
+        views: 1,
+        owner: 1,
+        likesCount: 1,
+        Isliked: 1,
+        createdAt: 1,
+      },
+    },
+  ]);
+
+  return res
     .status(200)
     .json(
-      new ApiResponse(201, video.videoFile, "Video have found Successfully")
+      new ApiResponse(201, video, "Video have found Successfully")
     );
 });
 
@@ -94,7 +183,9 @@ const deleteVideo = asyncHandler(async (req, res) => {
     throw new ApiError(500, "Failed to delete video");
   }
 
-  res.status(200).json(new ApiResponse(201, "Video Deleted Successfully"));
+  return res
+    .status(200)
+    .json(new ApiResponse(201, "Video Deleted Successfully"));
 });
 const updateVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
@@ -135,7 +226,7 @@ const updateVideo = asyncHandler(async (req, res) => {
 
   await deleteFromCloudinary(oldthumbnail.thumbnail);
 
-  res
+  return res
     .status(200)
     .json(
       new ApiResponse(
@@ -146,4 +237,39 @@ const updateVideo = asyncHandler(async (req, res) => {
     );
 });
 
-export { publishAVideo, getVideoById, deleteVideo, updateVideo };
+const togglePublishStatus = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+
+  if (!isValidObjectId(videoId)) {
+    throw new ApiError(400, "Invalid ObjectId");
+  }
+
+  const published = await Video.findOne({ _id: videoId, owner: req.user?._id });
+  // console.log(published);
+  if (!published) {
+    throw new ApiError(400, "video not found");
+  }
+  const isPublished = published.isPublished;
+  const statuschange = await Video.findByIdAndUpdate(
+    videoId,
+    {
+      $set: {
+        isPublished: !isPublished,
+      },
+    },
+    { new: true }
+  );
+  return res
+    .status(201)
+    .json(
+      new ApiResponse(200, { statuschange }, "Video Status Change successfully")
+    );
+});
+
+export {
+  publishAVideo,
+  getVideoById,
+  deleteVideo,
+  updateVideo,
+  togglePublishStatus,
+};
