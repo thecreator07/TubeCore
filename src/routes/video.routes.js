@@ -3,6 +3,7 @@ import { verifyJwt } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import {
   deleteVideo,
+  getAllVideos,
   getVideoById,
   publishAVideo,
   togglePublishStatus,
@@ -12,7 +13,7 @@ import {
 const router = Router();
 router.use(verifyJwt); //it will Apply verifyJwt to all routes in this files
 
-router.route("/").post(
+router.route("/").get(getAllVideos).post(
   upload.fields([
     {
       name: "videoFile",
