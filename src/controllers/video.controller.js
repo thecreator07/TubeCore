@@ -20,23 +20,22 @@ const getAllVideos = asyncHandler(async (req, res) => {
   // this helps in seraching only in title, description providing faster search results
 
   // here the name of search index is 'search-videos'
-  // if (query) {
-  //   pipeline.push({
-  //     $search: {
-  //       index: "search-videos",
-  //       text: {
-  //         query: query,
-  //         path: ["title", "description"], //search only on title, description
-  //       },
-  //     },
-  //   });
-  // }
+  if (query) {
+    pipeline.push({
+      $search: {
+        index: "video_searching",
+        text: {
+          query: query,
+          path: ["title", "description"], //search only on title, desc
+        },
+      },
+    });
+  }
 
   if (userId) {
     if (!isValidObjectId(userId)) {
       throw new ApiError(400, "Invalid userId");
     }
-
     pipeline.push({
       $match: {
         owner: new mongoose.Types.ObjectId(userId),
@@ -56,18 +55,10 @@ const getAllVideos = asyncHandler(async (req, res) => {
   if (sortBy && sortType) {
     pipeline.push({
       $sort: {
-        [sortBy]: sortType === "asc" ? 1 : -1,
+        [sortBy || "createdAt"]: sortType === "desc" ? -1 : 1,
       },
     });
-  } else {
-    pipeline.push({ $sort: { createdAt: -1 } });
   }
-
-  // const skip = (page - 1) * limit;
-  // pipeline.push({
-  //   // $skip: skip,
-  //   $limit: limit,
-  // });
 
   pipeline.push(
     {
@@ -75,7 +66,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
         from: "users",
         localField: "owner",
         foreignField: "_id",
-        as: "ownerDetails",
+        as: "owner",
         pipeline: [
           {
             $project: {
@@ -85,19 +76,23 @@ const getAllVideos = asyncHandler(async (req, res) => {
           },
         ],
       },
+    },
+    {
+      $unwind: "$owner",
     }
-    // {
-    //   $unwind: "$ownerDetails",
-    // }
   );
 
-  // pipeline.push({
-  //   $sort: {
-  //     [sortBy || "createdAt"]: sortType === "desc" ? -1 : 1,
-  //   },
-  // });
+  //it will skip the document
+  // example:- page-2, (2-1)*10=10, it means it will skip the first 10 document
+  const skip = (page - 1) * limit;
+  pipeline.push({
+    $skip: skip,
+  });
+  pipeline.push({
+    $limit: limit,
+  });
 
-  const myaggregate = await Video.aggregate(pipeline);
+  const myaggregate = Video.aggregate(pipeline);
 
   const options = {
     page: parseInt(page, 10),
@@ -109,6 +104,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     .status(201)
     .json(new ApiResponse(200, results, "videos fetched successfully"));
 });
+
 const publishAVideo = asyncHandler(async (req, res) => {
   const { title, description } = req.body;
   // TODO: get video, upload to cloudinary, create video
