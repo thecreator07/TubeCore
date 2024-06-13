@@ -1,7 +1,7 @@
 {
   "name": "projectbackend",
   "version": "1.0.0",
-  "description": "backend with hitesh chaudhary",
+  "description": "youtube backend",
   "main": "index.js",
   "type": "module",
   "scripts": {
